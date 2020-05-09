@@ -3,9 +3,9 @@
    "version": "1.0.0",
    "description": "JavaScript development environment Pluralsight course by Cory House",
    "scripts": {
-      "prestart": "node buildScripts/startMessage.js",
-      "start": "npm-run-all --parallel open:src share-ltgit ad",
-      "open:src": "node buildScripts/srcServer.js",
+      "prestart": "babel-node buildScripts/startMessage.js",
+      "start": "npm-run-all --parallel open:src share-lt",
+      "open:src": "babel-node buildScripts/srcServer.js",
       "share-lt": "lt -h \"http://serverless.social\" -p 3000",
       "share-ng": "ngrok http 3000"
    },
