@@ -7,7 +7,7 @@ describe('Our first test', () => {
    it('should pass', () => {
       expect(true).to.equal(true);
    })
-})
+});
 
 describe('index.html', () => {
    it('it should say users', (done) => {
@@ -20,4 +20,4 @@ describe('index.html', () => {
       done();
       window.close();
    })
-})
+});
