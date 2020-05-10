@@ -1,6 +1,8 @@
 // import the path package, as we are using babel, 'require' is changed to 'import from'
 import path from 'path';
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import WebpackMd5Hash from 'webpack-md5-hash';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 // Webpack is configured by 'export'ing an object
 export default {
@@ -18,12 +20,10 @@ export default {
    mode: 'production',
 
    // This is the entry point of the Webpack
-   entry: [
-      // Not doing a hot-reloading at this point and just keeping it simple to the SRC/Index
-      // using __dirname, which is part of node.js, which will give the full path here.
-      // also using the 'path' package, which also comes with node.js and has been imported above
-      path.resolve(__dirname, 'src/index')
-   ],
+   entry: {
+      vendor: path.resolve(__dirname, 'src/vendor'),
+      main: path.resolve(__dirname, 'src/index')
+   },
 
    // the target of the Webpack bundle for our current purpose is the web. It could also be 'node', or 'elektron' for desktop apps
    target: 'web',
@@ -34,14 +34,21 @@ export default {
    output: {
       path: path.resolve(__dirname, 'dist'),
       publicPath: '/',
-      filename: 'bundle.js'
+      filename: '[name].[chunkhash].js'
    },
 
    // define any plug-ins, if they are to be used - hot-reloading, linting, caching, styles, etc.
    plugins: [
+      // Generate an external css file with a hash in the filename
+      new ExtractTextPlugin('[name].[chunkhash].css'),
+
+      //Hash the files using MD5 so that their names change when the content changes.
+      new WebpackMd5Hash(),
+
+      //Create HTML file that includes reference to bundled JS
       new HtmlWebpackPlugin({
          template: 'src/index.html',
-         minify:{
+         minify: {
             removeComments: true,
             collapseWhitespace: true,
             removeRedundantAttributes: true,
@@ -57,7 +64,12 @@ export default {
       })
    ],
    optimization: {
-      minimize: true
+      minimize: true,
+      //Use splitChunks to create a separate bundle
+      //of vendor libraries so that they're cached separately
+      splitChunks: {
+         name: 'vendor'
+      }
    },
    // This informs Webpack about the file types that we wish to handle
    module: {
@@ -74,9 +86,17 @@ export default {
          loader: ['babel-loader']
       },
          {
-            // also, it is handling the .CSS files for us.
             test: /\.css$/,
-            loader: ['style-loader', 'css-loader']
-         }]
+            use: ExtractTextPlugin.extract({
+               fallback: "style-loader",
+               use: [
+                  {
+                     loader: "css-loader",
+                     options: {sourceMap: true}  // <=
+                  }
+               ]
+            })
+         }
+      ]
    },
 }

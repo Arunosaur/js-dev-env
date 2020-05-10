@@ -1,3 +1,5 @@
+import './index.css';
+
 import {deleteUser, getUsers} from "./api/userAPI";
 
 //Populate table of users via API call.
